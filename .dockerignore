@@ -1,3 +1,6 @@
 __pycache__
 .git
 venv
+_tmp
+.vscode
+.env
