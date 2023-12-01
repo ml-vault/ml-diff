@@ -6,3 +6,4 @@ _temp
 .vscode
 .env
 _tmp
+.apikey
