@@ -1,5 +1,6 @@
 venv
 __pycache__
+_temp
 *.pyc
 *.egg-info
 .vscode
