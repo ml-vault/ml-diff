@@ -1,14 +1,13 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: build-docker-image-push
 on: 
   push:
     branches:
     - build
 jobs:
-  check-bats-version:
+  push-build:
     runs-on: ubuntu-latest
     steps:
-      - name: リポジトリをクローン
+      - name: Clone repo
         uses: actions/checkout@v3
       - name: Login to Docker Hub
         uses: docker/login-action@v3
