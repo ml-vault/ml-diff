@@ -3,5 +3,5 @@ COPY ./server.sh /
 WORKDIR /root
 COPY . .
 RUN ./setup-prebuilt.sh
-RUN chmod +x /server.py
-CMD ["python", "/server.py"]
+RUN chmod +x server.py
+CMD ["python", "server.py"]
