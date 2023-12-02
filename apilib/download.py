@@ -101,3 +101,4 @@ def download_dataset_from_hf(local_dir:str, repo_name:str):
         open(to_save_caption_path, 'w').write(data['caption'])
         Image.fromarray(nparr).save(to_save_img_path)
     toml.dump(config, open(config_file_path, 'w'))
+    print("dataset downloaded!")
