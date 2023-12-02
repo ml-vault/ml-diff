@@ -226,6 +226,7 @@ def train_lora_xl(base_path:str,
         print("Skipping training")
         return
     run_cli(cmd)
-    print("Training done!")
+    print("model trained!")
+    return output_config.out_dir
 
 print("Done!")
