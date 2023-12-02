@@ -1,4 +1,4 @@
-sd_scripts_path = "./difflex"
+sd_scripts_path = "/workspace/difflex"
 import os
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
@@ -220,7 +220,7 @@ def train_lora_xl(base_path:str,
     )
 
     args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sampler_config, optimizer_config=AdamW8bitConfig())
-    cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/train_network.py {args}"
+    cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
     print(f"Going to run {cmd}")
     run_cli(cmd.split())
     print("Training done!")
