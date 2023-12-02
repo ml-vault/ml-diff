@@ -16,10 +16,6 @@ def ask(msg:str):
     print(msg)
     return input()
 
-def is_model(name:str)->bool:
-    file_name, ext = os.path.splitext(name)
-    return ext in ['.safetensors', '.ckpt']
-
 def download_lora_from_hf(hf_repo_name=""):
     repo_name=hf_repo_name or ask("hf lora repo name?")
     repo_id=f"{HF_USER}/{repo_name}"
@@ -35,21 +31,6 @@ def download_lora_from_civit_ai(lora_model_id=""):
     model_id=lora_model_id or ask("lora model id?")
     # !wget -P $sd_lora_dir https://civitai.com/api/download/models/$model_id --content-disposition
     
-def upload_models_to_hf(model_name:str, upload_dir:str):
-    repo_name = f"{HF_USER}/{model_name}"
-    create_repo(repo_name, token=W_TOKEN, private=True, exist_ok=True)
-    file_list = list(os.listdir(upload_dir))
-    models = list(filter(lambda file: is_model(file) == True, file_list))
-    
-    for file_path in models:
-      base_name = os.path.basename(file_path)
-      file_full_path=f"{upload_dir}/{file_path}"
-    #   if not file_exists(model_name, base_name):
-      upload_file(path_or_fileobj=file_full_path, path_in_repo=base_name, repo_id=repo_name, token=W_TOKEN)
-    #   else:
-    #     print(f"file existing: {base_name}")
-    print("done!")
-
 def download_dataset_from_hf(local_dir:str, repo_name:str):
     from os import makedirs
     import os
