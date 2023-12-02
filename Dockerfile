@@ -7,6 +7,8 @@ RUN apt-get update && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-RUN ./setup-prebuilt.sh
+RUN ./difflex/setup-prebuilt.sh
+RUN pip install -e ./difflex
+RUN pip install -e ./apilib
 RUN chmod +x server.py
 CMD ["python", "server.py"]
