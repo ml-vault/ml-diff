@@ -18,7 +18,7 @@ RUN pip install fastapi tensorflow-gpu==2.8.0 uvicorn xformers==0.0.21 bitsandby
 RUN pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
 RUN pip install xformers==0.0.21 bitsandbytes==0.41.1
 RUN pip install tensorboard==2.14.1 tensorflow==2.14.0 wheel
-RUN pip installtensorrt
+RUN pip install tensorrt
 RUN pip install -r ./requirements.txt
 RUN pip install -e ./difflex
 RUN pip install -e ./apilib
