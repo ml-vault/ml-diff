@@ -4,7 +4,6 @@ import runpod
 from runpod.serverless.utils.rp_validator import validate
 from schema import SCHEMAS 
 from apilib.download import download_dataset_from_hf
-from dotenv import load_dotenv
 from apilib.util.env import DATASET_DIR, TRAIN_DIR
 
 

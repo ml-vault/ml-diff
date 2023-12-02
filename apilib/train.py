@@ -225,7 +225,7 @@ def train_lora_xl(base_path:str,
     if SKIP_PROC:
         print("Skipping training")
         return
-    run_cli(cmd.split())
+    run_cli(cmd)
     print("Training done!")
 
 print("Done!")
