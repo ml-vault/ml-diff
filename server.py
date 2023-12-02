@@ -29,6 +29,7 @@ def handler(job):
         if func == "TRAIN_XL_LORA":
             dataset_name = job_input['dataset_repo']
             config_path = download_dataset_from_hf(DATASET_DIR, dataset_name)
+            print(f"config path {config_path}")
             train_lora_xl(
                 TRAIN_DIR,
                 config_file_path=config_path,
@@ -53,8 +54,10 @@ def handler(job):
             }
 
     except Exception as e:
-        print(e)
-        return "Has error"
+        return {
+            "error": "unknown",
+            "message":e
+        }
 
         
 
