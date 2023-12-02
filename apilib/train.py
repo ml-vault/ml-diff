@@ -218,6 +218,8 @@ def train_lora_xl(base_path:str,
         continue_from=continue_from,
         mixed_precision="bf16"
     )
+    print(os.getcwd())
+    print(os.getcwdb())
 
     args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sampler_config, optimizer_config=AdamW8bitConfig())
     cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
