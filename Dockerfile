@@ -22,6 +22,7 @@ RUN pip install tensorrt
 RUN pip install -r ./requirements.txt
 RUN pip install -e ./difflex
 RUN pip install -e ./apilib
+RUN pip install -U huggingface_hub
 RUN chmod +x server.py
 ENV HF_DATASETS_CACHE /workspace/.cache/huggingface/
 CMD ["python", "server.py"]
