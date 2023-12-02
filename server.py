@@ -19,7 +19,7 @@ def handler(job):
         job_input = job["input"] # Access the input from the request.
         func = job_input["fn"] # Access the function name from the input.
         target_schema = SCHEMAS[func]
-        validated_input: Dict = validate(job_input, target_schema) 
+        validated_input = validate(job_input, target_schema) 
         
         if 'errors' in validated_input:
             raise ValidateError(validated_input['errors'])
@@ -27,17 +27,17 @@ def handler(job):
         if func == "TRAIN_XL_LORA":
             dataset_name = job_input['dataset_repo']
             config_path = download_dataset_from_hf(DATASET_DIR, dataset_name)
-            print(f"config path {config_path}")
+            input : Dict = validated_input['validated_input']
             train_lora_xl(
                 TRAIN_DIR,
                 config_file_path=config_path,
-                max_train_epochs=validated_input['max_train_epochs'],
-                train_batch_size=validated_input['train_batch_size'],
-                model_name=validated_input['model_name'],
-                save_every_n_epochs=validated_input['save_every_n_epochs'],
-                learning_rate=validated_input['learning_rate'],
-                network_dim=validated_input["network_dim"],
-                network_alpha=validated_input["network_alpha"]
+                max_train_epochs=input['max_train_epochs'],
+                train_batch_size=input['train_batch_size'],
+                model_name=input['model_name'],
+                save_every_n_epochs=input['save_every_n_epochs'],
+                learning_rate=input['learning_rate'],
+                network_dim=input["network_dim"],
+                network_alpha=input["network_alpha"]
                 )
 
         return "Your job results"

@@ -197,11 +197,13 @@ def train_lora_xl(base_path:str,
                   sampler_config:Optional[SampleConfig] = None,
                   continue_from:Optional[str] = None
                  ):
+    print("train called")
     output_config = OutputConfig(
         base_path=base_path,
         model_name=model_name,
         save_every_n_epochs=save_every_n_epochs
     )
+    print("output config done!")
     train_config = TrainConfig(
         config_file_path=config_file_path,
         pretrained_model_name_or_path=__pt_xl,
