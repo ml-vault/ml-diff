@@ -9,8 +9,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 RUN . /workspace/venv/bin/activate
 RUN ./difflex/setup-prebuilt.sh
-RUN pip install -r ./difflex/requirements.txt
-RUN pip install -r ./difflex/requirements_runpod.txt
 RUN pip install -e ./difflex
 RUN pip install -e ./apilib
 RUN chmod +x server.py
