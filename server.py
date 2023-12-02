@@ -2,6 +2,7 @@ from typing import Dict
 from apilib.train import train_lora_xl
 import runpod
 from runpod.serverless.utils.rp_validator import validate
+from apilib.upload import upload_models_to_hf
 from schema import SCHEMAS 
 from apilib.download import download_dataset_from_hf
 from apilib.util.env import DATASET_DIR, TRAIN_DIR
@@ -27,7 +28,7 @@ def handler(job):
             dataset_name = job_input['dataset_repo']
             config_path = download_dataset_from_hf(DATASET_DIR, dataset_name)
             input : Dict = validated_input['validated_input']
-            train_lora_xl(
+            output_dir = train_lora_xl(
                 TRAIN_DIR,
                 config_file_path=config_path,
                 max_train_epochs=input['max_train_epochs'],
@@ -38,8 +39,10 @@ def handler(job):
                 network_dim=input["network_dim"],
                 network_alpha=input["network_alpha"]
                 )
+            upload_models_to_hf(input['model_name'], output_dir)
+            return "Train completed and uploaded to HF"
 
-        return "Your job results"
+        return "Unknown function"
 
     except ValidateError as e:
         print(e.message)
