@@ -1,11 +1,25 @@
-TRAIN_XL_LORA = {
-    "fn":{
-        "type": str,
-        "required": True,
-    },
-    "dataset": {
-        "type": str,
-        'required': True,
+SCHEMAS = {
+    "TRAIN_XL_LORA": {
+        "fn":{
+            "type": str,
+            "required": True,
+        },
+        "dataset_repo": {
+            "type": str,
+            'required': True,
+        },
+        "model_name":{
+            "type": str,
+            'required': True,
+        },
+        "max_train_epochs":{
+            "type": int,
+            'required': True,
+        },
+        "train_batch_size":{
+            "type": int,
+            'required': True,
+        },
     }
 }
 

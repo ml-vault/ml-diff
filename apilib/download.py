@@ -102,3 +102,4 @@ def download_dataset_from_hf(local_dir:str, repo_name:str):
         Image.fromarray(nparr).save(to_save_img_path)
     toml.dump(config, open(config_file_path, 'w'))
     print("dataset downloaded!")
+    return f"{local_dir}/{repo_name}/config.toml"

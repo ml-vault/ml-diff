@@ -1,19 +1,20 @@
-sd_scripts_path = "/workspace/pods_note"
+sd_scripts_path = "/workspace/difflex"
 import os
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
 import subprocess
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+hf_username= os.getenv('HF_USER')
+r_token = os.getenv('R_TOKEN')
+w_token = os.getenv('W_TOKEN')
+
 alpha = "abcdefghijklmnopqrstuvwxyz"
-__pt_xl = "/workspace/models/sd_xl_base_1.0.safetensors"
+__pt_xl = "stabilityai/stable-diffusion-xl-base-1.0"
 __pt_15 = "/workspace/models/v1-5-pruned.safetensors"
-
-hf_username="togoron" #@param {type:"string"
-r_token = "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" #@param {type:"string"
-w_token = "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" #@param {type:"string"
-
-sd_lora_dir = "/workspace/sd/stable-diffusion-webui/models/Lora"
-sd_model_dir='/workspace/sd/stable-diffusion-webui/models/Stable-diffusion'
 
 def done():
     print("done!")
@@ -191,12 +192,12 @@ def train_lora(base_path:str,
 def train_lora_xl(base_path:str,
                   config_file_path:str,
                   model_name:str,
-                  save_every_n_epochs:int,
                   max_train_epochs:int,
                   train_batch_size:int,
-                  learning_rate:float,
-                  network_dim:int,
-                  network_alpha:int,
+                  save_every_n_epochs:int=10,
+                  learning_rate:float=1e-6,
+                  network_dim:int=32,
+                  network_alpha:int=32,
                   sampler_config:Optional[SampleConfig] = None,
                   continue_from:Optional[str] = None
                  ):
@@ -218,6 +219,9 @@ def train_lora_xl(base_path:str,
     )
 
     args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sampler_config, optimizer_config=AdamW8bitConfig())
-    # !accelerate launch --mixed_precision bf16 $sd_scripts_path/sdxl_train_network.py $args
+    cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/train_network.py {args}"
+    print(f"Going to run {cmd}")
+    subprocess.run(cmd.split())
+    print("Training done!")
 
 print("Done!")
