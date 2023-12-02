@@ -5,10 +5,8 @@ from runpod.serverless.utils.rp_validator import validate
 from schema import SCHEMAS 
 from apilib.download import download_dataset_from_hf
 from dotenv import load_dotenv
-from apilib.util.dir import DATASET_DIR, TRAIN_DIR
+from apilib.util.env import DATASET_DIR, TRAIN_DIR
 
-# .envファイルの内容を読み込見込む
-load_dotenv()
 
 class ValidateError(Exception):
     message: str
@@ -41,9 +39,7 @@ def handler(job):
                 network_dim=validated_input["network_dim"],
                 network_alpha=validated_input["network_alpha"]
                 )
-            
-    # Add your custom code here.
-    
+
         return "Your job results"
 
     except ValidateError as e:
@@ -56,7 +52,7 @@ def handler(job):
     except Exception as e:
         return {
             "error": "unknown",
-            "message":e
+            "message":e.__dict__
         }
 
         

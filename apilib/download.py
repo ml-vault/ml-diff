@@ -1,17 +1,13 @@
 from typing import Any
-from dotenv import load_dotenv
 from  huggingface_hub import hf_hub_download
 import os
-load_dotenv()
+from apilib.util.env import HF_USER, R_TOKEN, W_TOKEN
+from huggingface_hub import snapshot_download, upload_file, create_repo
 
-hf_username= os.getenv('HF_USER')
-r_token = os.getenv('R_TOKEN')
-w_token = os.getenv('W_TOKEN')
 
 sd_lora_dir = "/workspace/sd/stable-diffusion-webui/models/Lora"
 sd_model_dir='/workspace/sd/stable-diffusion-webui/models/Stable-diffusion'
 
-from huggingface_hub import snapshot_download, notebook_login, upload_file, create_repo
 
 def download_from_hf(repo_id:str, filename:str, local_dir:str):
     hf_hub_download(repo_id=repo_id, filename=filename, local_dir=local_dir, force_download=True, local_dir_use_symlinks=False)
@@ -26,9 +22,9 @@ def is_model(name:str)->bool:
 
 def download_lora_from_hf(hf_repo_name=""):
     repo_name=hf_repo_name or ask("hf lora repo name?")
-    repo_id=f"{hf_username}/{repo_name}"
+    repo_id=f"{HF_USER}/{repo_name}"
     download_dir = f"{sd_lora_dir}/{repo_name}"
-    snapshot_download(repo_id=repo_id, local_dir=download_dir, token=r_token, cache_dir="/workspace/hub-cache")
+    snapshot_download(repo_id=repo_id, local_dir=download_dir, token=R_TOKEN, cache_dir="/workspace/hub-cache")
     
 def download_ckpt_from_civit_ai(version:str, ckpt_model_id=""):
     model_id= ckpt_model_id or ask("ckpt model id?")
@@ -40,8 +36,8 @@ def download_lora_from_civit_ai(lora_model_id=""):
     # !wget -P $sd_lora_dir https://civitai.com/api/download/models/$model_id --content-disposition
     
 def upload_models_to_hf(model_name:str, upload_dir:str):
-    repo_name = f"{hf_username}/{model_name}"
-    create_repo(repo_name, token=w_token, private=True, exist_ok=True)
+    repo_name = f"{HF_USER}/{model_name}"
+    create_repo(repo_name, token=W_TOKEN, private=True, exist_ok=True)
     file_list = list(os.listdir(upload_dir))
     models = list(filter(lambda file: is_model(file) == True, file_list))
     
@@ -49,7 +45,7 @@ def upload_models_to_hf(model_name:str, upload_dir:str):
       base_name = os.path.basename(file_path)
       file_full_path=f"{upload_dir}/{file_path}"
     #   if not file_exists(model_name, base_name):
-      upload_file(path_or_fileobj=file_full_path, path_in_repo=base_name, repo_id=repo_name, token=w_token)
+      upload_file(path_or_fileobj=file_full_path, path_in_repo=base_name, repo_id=repo_name, token=W_TOKEN)
     #   else:
     #     print(f"file existing: {base_name}")
     print("done!")
@@ -64,7 +60,7 @@ def download_dataset_from_hf(local_dir:str, repo_name:str):
     from huggingface_hub import hf_hub_download
     from tqdm import tqdm 
 
-    user_name = hf_username
+    user_name = HF_USER
     repo_id = f"{user_name}/{repo_name}"
 
     r_token = os.getenv('R_TOKEN') #@param {type:"string"

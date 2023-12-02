@@ -5,14 +5,8 @@ from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
 from apilib.util import run_cli
 import subprocess
+from apilib.util.env import SKIP_PROC
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-hf_username= os.getenv('HF_USER')
-r_token = os.getenv('R_TOKEN')
-w_token = os.getenv('W_TOKEN')
 
 alpha = "abcdefghijklmnopqrstuvwxyz"
 __pt_xl = "stabilityai/stable-diffusion-xl-base-1.0"
@@ -226,6 +220,9 @@ def train_lora_xl(base_path:str,
     cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
     print(f"Going to run {cmd}")
     sleep(10)
+    if SKIP_PROC:
+        print("Skipping training")
+        return
     run_cli(cmd.split())
     print("Training done!")
 
