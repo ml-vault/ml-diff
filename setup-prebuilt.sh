@@ -16,10 +16,10 @@ echo "Running setup_linux.py..."
 python "difflex/setup/setup_linux.py" --platform-requirements-file=requirements_runpod.txt --show_stdout --no_run_accelerate
 pip3 cache purge
 
-# Configure accelerate
-echo "Configuring accelerate..."
-mkdir -p "/root/.cache/huggingface/accelerate"
-cp "difflex/config_files/accelerate/runpod.yaml" "/root/.cache/huggingface/accelerate/default_config.yaml"
+# # Configure accelerate
+# echo "Configuring accelerate..."
+# mkdir -p "/root/.cache/huggingface/accelerate"
+# cp "difflex/config_files/accelerate/runpod.yaml" "/root/.cache/huggingface/accelerate/default_config.yaml"
 
 pip install -r difflex/requirements_runpod.txt
 pip install nvidia-cudnn-cu11==8.9.4.25 --no-cache-dir
