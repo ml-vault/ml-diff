@@ -32,9 +32,13 @@ def handler(job):
             train_lora_xl(
                 TRAIN_DIR,
                 config_file_path=config_path,
-                max_train_epochs=job_input['max_train_epochs'],
-                train_batch_size=job_input['train_batch_size'],
-                model_name=job_input['model_name']
+                max_train_epochs=validated_input['max_train_epochs'],
+                train_batch_size=validated_input['train_batch_size'],
+                model_name=validated_input['model_name'],
+                save_every_n_epochs=validated_input['save_every_n_epochs'],
+                learning_rate=validated_input['learning_rate'],
+                network_dim=validated_input["network_dim"],
+                network_alpha=validated_input["network_alpha"]
                 )
             
     # Add your custom code here.
