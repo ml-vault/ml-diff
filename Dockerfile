@@ -1,4 +1,4 @@
-FROM runpod/pytorch:2.0.1-py3.10-cuda11.8.0-devel-ubuntu22.04
+FROM ashleykza/stable-diffusion-webui:3.6.1
 WORKDIR /workspace
 COPY . .
 RUN apt-get update && \
@@ -7,6 +7,7 @@ RUN apt-get update && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+RUN . /workspace/venv/bin/activate
 RUN ./difflex/setup-prebuilt.sh
 RUN pip install -r ./difflex/requirements.txt
 RUN pip install -r ./difflex/requirements_runpod.txt
