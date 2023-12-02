@@ -26,7 +26,7 @@ pip install nvidia-cudnn-cu11==8.9.4.25 --no-cache-dir
 pip install --pre --extra-index-url https://pypi.nvidia.com tensorrt==9.0.1.post11.dev4 --no-cache-dir
 pip install polygraphy --extra-index-url https://pypi.ngc.nvidia.com
 pip install onnx-graphsurgeon --extra-index-url https://pypi.ngc.nvidia.com
-pip install fastapi tensorflow-gpu==2.8.0 uvicorn xformers==0.0.21 bitsandbytes==0.41.1 datasets toml Pillow python-dotenv runpod accelerate==0.12.0
+pip install fastapi tensorflow-gpu==2.8.0 uvicorn xformers==0.0.21 bitsandbytes==0.41.1 datasets toml Pillow python-dotenv runpod accelerate==0.12.0 protobuf==3.20.2
 pip install --upgrade huggingfafce-hub
 pip install -e ./difflex
 pip install -e ./apilib
