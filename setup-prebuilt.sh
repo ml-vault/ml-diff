@@ -21,7 +21,7 @@ echo "Configuring accelerate..."
 mkdir -p "/root/.cache/huggingface/accelerate"
 cp "difflex/config_files/accelerate/runpod.yaml" "/root/.cache/huggingface/accelerate/default_config.yaml"
 
-pip install -r requirements_runpod.txt
+pip install -r difflex/requirements_runpod.txt
 pip install nvidia-cudnn-cu11==8.9.4.25 --no-cache-dir
 pip install --pre --extra-index-url https://pypi.nvidia.com tensorrt==9.0.1.post11.dev4 --no-cache-dir
 pip install polygraphy --extra-index-url https://pypi.ngc.nvidia.com
