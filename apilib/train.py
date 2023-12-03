@@ -248,7 +248,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
     )
     sample_config = SampleConfig(sampler= datapack.sample.sampler, 
                                  sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
-                                 prompt_path=datapack.sample.prompt_path
+                                 prompt_path= f"{base_dir}/sample.txt"
                                  )
     args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
     cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
