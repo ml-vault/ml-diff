@@ -3,6 +3,7 @@ import os
 from time import sleep
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
+from apilib.datapack import DataPack
 from apilib.util import run_cli
 import subprocess
 from apilib.util.env import SKIP_PROC, SDXL
@@ -61,7 +62,7 @@ class OptimizerConfig(metaclass=ABCMeta):
         self.optimizer_type = optimizer_type
 
     @abstractmethod
-    def getArgs() -> str:
+    def getArgs(self) -> str:
         pass
 
 class AdamW8bitConfig(OptimizerConfig):
@@ -227,4 +228,30 @@ def train_lora_xl(base_path:str,
     print("model trained!")
     return output_config.out_dir
 
+
+def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
+    base_dir = os.path.dirname(toml_config)
+    output_config = OutputConfig(
+        base_path=base_dir,
+        model_name=datapack.output.model_name,
+        save_every_n_epochs=datapack.output.save_every_n_epochs
+    )
+    train_config = TrainConfig(
+        config_file_path=toml_config,
+        pretrained_model_name_or_path=SDXL,
+        max_train_epochs=datapack.output,
+        train_batch_size=datapack.train.train_batch_size,
+        learning_rate=datapack.train.learning_rate,
+        network_dim=datapack.train.network_dim,
+        network_alpha=datapack.train.network_alpha,
+        mixed_precision="bf16"
+    )
+    sample_config = SampleConfig(sampler= datapack.sample.sampler, 
+                                 sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
+                                 prompt_path=datapack.sample.prompt_path
+                                 )
+    args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
+    cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
+    run_cli(cmd)
+    return
 print("Done!")

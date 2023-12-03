@@ -8,39 +8,6 @@ SCHEMAS = {
             "type": str,
             'required': True,
         },
-        "model_name":{
-            "type": str,
-            'required': True,
-        },
-        "max_train_epochs":{
-            "type": int,
-            'required': True,
-        },
-        "train_batch_size":{
-            "type": int,
-            'required': True,
-        },
-        "save_every_n_epochs":{
-            "type": int,
-            'required': False,
-            "default": 10,
-        },
-        "learning_rate":{
-            "type": float,
-            'required': False,
-            "default": 1e-4,
-        },
-        "network_dim":{
-            "type": int,
-            'required': False,
-            "default": 32,
-        },
-        "network_alpha":{
-            "type": int,
-            "required": False,
-            "default": 32,
-        }
-
     }
 }
 
