@@ -25,4 +25,5 @@ RUN pip install -e ./apilib
 RUN pip install -U huggingface_hub
 RUN chmod +x server.py
 ENV HF_DATASETS_CACHE /workspace/.cache/huggingface/
+RUN python ./init.py
 CMD ["python", "server.py"]
