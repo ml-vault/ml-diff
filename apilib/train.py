@@ -43,6 +43,7 @@ class OutputConfig:
         self.model_name = model_name
         self.save_every_n_epochs = save_every_n_epochs
         self.save_model_as = save_model_as
+        print("output config done!")
         pass
 
     @property
@@ -112,6 +113,7 @@ class TrainConfig:
         self.network_module = network_module
         self.max_data_loader_n_workers = max_data_loader_n_workers
         self.continue_from = continue_from
+        print("train config done!")
         pass
 
     def getArgs(self) -> str:
@@ -141,6 +143,7 @@ class SampleConfig:
         self.sampler = sampler
         self.sample_every_n_epochs = sample_every_n_epochs
         self.prompt_path = prompt_path
+        print("sample config done!")
         pass
     def getArgs(self) -> str:
         return f"--sample_every_n_epochs {self.sample_every_n_epochs} --sample_prompts {self.prompt_path} --sample_sampler {self.sampler}"
@@ -230,6 +233,7 @@ def train_lora_xl(base_path:str,
 
 
 def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
+    print("train called")
     base_dir = os.path.dirname(toml_config)
     output_config = OutputConfig(
         base_path=base_dir,
@@ -252,6 +256,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
                                  )
     args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
     cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
+    print(f"Going to run {cmd}")
     run_cli(cmd)
     return
 print("Done!")

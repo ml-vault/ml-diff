@@ -239,6 +239,7 @@ class DataPack:
         )
     
     def export_files(self, base_dir:str, r_token:str):
+        print("start exporting files!")
         hf_hub_download(repo_id=self.input.repo_id, filename="config.yml", repo_type="dataset", local_dir=base_dir, token=r_token)
         dataset_dir = f"{base_dir}/datasets"
         self.__export_datasets(dataset_dir, r_token)
@@ -249,11 +250,11 @@ class DataPack:
         sample_prompt:list[str] = self.sample.prompts
         sample_prompt_path = f"{base_dir}/sample.txt"
         open(sample_prompt_path, "w").write("\n".join(sample_prompt))
-        
-    
+        print("sample prompt written!")
     def __write_toml(self, base_dir:str):
         toml_dict = self.input.to_toml_dict(join_path(base_dir, "datasets"))
         toml.dump(toml_dict, open(f"{base_dir}/config.toml", "w"))
+        print("toml written!")
     
     def __export_datasets(self, dataset_dir:str, r_token:str):
         repo_id = self.input.repo_id
@@ -275,6 +276,7 @@ class DataPack:
             open(to_save_caption_path, 'w').write(caption)
             nparr = np.array(image)
             Image.fromarray(nparr).save(to_save_img_path)
+        print("datasets exported!")
 
 class DataPackLoader:
     @staticmethod
