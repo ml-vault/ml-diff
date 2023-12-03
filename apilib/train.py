@@ -14,24 +14,6 @@ alpha = "abcdefghijklmnopqrstuvwxyz"
 def done():
     print("done!")
 
-def get_name(name:str):
-    filename, file_extension = os.path.splitext(name)
-    return filename
-
-def get_ext(name:str):
-    filename, file_extension = os.path.splitext(name)
-    return file_extension
-
-def is_ckpt(name:str):
-    ext = get_ext(name)
-    return ext == ".safetensors" or ext == ".ckpt"
-
-def add_line(file ,key: str, val:str) -> str:
-    return file.write(f"{key}: {val}\n")
-
-def trim_map(x: str) -> list[str]:
-    return list(map(lambda x: x.strip(), x.split(",")))
-
 class OutputConfig:
     base_path:str
     model_name:str
@@ -232,8 +214,9 @@ def train_lora_xl(base_path:str,
     return output_config.out_dir
 
 
-def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
+def train_xl_lora_from_datapack(datapack: DataPack):
     print("train called")
+    toml_config = datapack.toml_path
     base_dir = os.path.dirname(toml_config)
     output_config = OutputConfig(
         base_path=base_dir,
@@ -243,7 +226,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, toml_config:str):
     train_config = TrainConfig(
         config_file_path=toml_config,
         pretrained_model_name_or_path=SDXL,
-        max_train_epochs=datapack.output,
+        max_train_epochs=datapack.train.max_train_epochs,
         train_batch_size=datapack.train.train_batch_size,
         learning_rate=datapack.train.learning_rate,
         network_dim=datapack.train.network_dim,
