@@ -5,12 +5,10 @@ from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
 from apilib.util import run_cli
 import subprocess
-from apilib.util.env import SKIP_PROC
+from apilib.util.env import SKIP_PROC, SDXL
 
 
 alpha = "abcdefghijklmnopqrstuvwxyz"
-__pt_xl = "stabilityai/stable-diffusion-xl-base-1.0"
-__pt_15 = "/workspace/models/v1-5-pruned.safetensors"
 
 def done():
     print("done!")
@@ -173,7 +171,7 @@ def train_lora(base_path:str,
     )
     train_config = TrainConfig(
         config_file_path=config_file_path,
-        pretrained_model_name_or_path=__pt_xl,
+        pretrained_model_name_or_path=SDXL,
         max_train_epochs=max_train_epochs,
         train_batch_size=train_batch_size,
         learning_rate=learning_rate,
@@ -206,7 +204,7 @@ def train_lora_xl(base_path:str,
     print("output config done!")
     train_config = TrainConfig(
         config_file_path=config_file_path,
-        pretrained_model_name_or_path=__pt_xl,
+        pretrained_model_name_or_path=SDXL,
         max_train_epochs=max_train_epochs,
         train_batch_size=train_batch_size,
         learning_rate=learning_rate,

@@ -1,13 +1,10 @@
 from typing import Any
 from  huggingface_hub import hf_hub_download
-import os
 from apilib.util.env import HF_USER, R_TOKEN, W_TOKEN
 from huggingface_hub import snapshot_download, upload_file, create_repo
 
-
 sd_lora_dir = "/workspace/sd/stable-diffusion-webui/models/Lora"
 sd_model_dir='/workspace/sd/stable-diffusion-webui/models/Stable-diffusion'
-
 
 def download_from_hf(repo_id:str, filename:str, local_dir:str):
     hf_hub_download(repo_id=repo_id, filename=filename, local_dir=local_dir, force_download=True, local_dir_use_symlinks=False)
