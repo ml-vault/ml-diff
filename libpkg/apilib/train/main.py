@@ -3,10 +3,10 @@ import os
 from time import sleep
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
-from apilib.datapack import DataPack
-from apilib.util import run_cli
+from ..datapack import DataPack
+from ..util import run_cli
 import subprocess
-from apilib.util.env import HF_USER, SKIP_PROC, SDXL
+from ..util.env import HF_USER, SKIP_PROC, SDXL
 
 
 alpha = "abcdefghijklmnopqrstuvwxyz"

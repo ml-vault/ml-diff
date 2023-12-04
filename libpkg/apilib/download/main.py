@@ -1,5 +1,5 @@
 from  huggingface_hub import hf_hub_download
-from apilib.util.env import HF_USER, R_TOKEN
+from ..util.env import HF_USER, R_TOKEN
 from huggingface_hub import snapshot_download
 
 sd_lora_dir = "/workspace/sd/stable-diffusion-webui/models/Lora"

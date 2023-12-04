@@ -1,5 +1,5 @@
-from apilib.util import is_model
-from apilib.util.env import HF_USER, W_TOKEN, R_TOKEN
+from ..util import is_model
+from ..util.env import HF_USER, W_TOKEN, R_TOKEN
 from huggingface_hub import upload_file, create_repo, file_exists, repo_exists, upload_folder
 import os
 
