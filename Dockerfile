@@ -14,7 +14,7 @@ RUN pip install nvidia-cudnn-cu11==8.9.4.25 --no-cache-dir
 RUN pip install --pre --extra-index-url https://pypi.nvidia.com tensorrt==9.0.1.post11.dev4 --no-cache-dir
 RUN pip install polygraphy --extra-index-url https://pypi.ngc.nvidia.com
 RUN pip install onnx-graphsurgeon --extra-index-url https://pypi.ngc.nvidia.com
-RUN pip install fastapi tensorflow-gpu==2.8.0 uvicorn xformers==0.0.21 bitsandbytes==0.41.1  toml Pillow python-dotenv runpod accelerate==0.12.0
+RUN pip install fastapi tensorflow-gpu==2.8.0 uvicorn xformers==0.0.21 bitsandbytes==0.41.1  toml Pillow python-dotenv runpod
 RUN pip install torch==2.0.1+cu118 torchvision==0.15.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
 RUN pip install xformers==0.0.21 bitsandbytes==0.41.1
 # RUN pip install tensorboard==2.14.1 tensorflow==2.14.0 wheel
