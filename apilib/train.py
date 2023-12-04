@@ -30,7 +30,7 @@ class OutputConfig:
 
     @property
     def out_dir(self):
-        return f"{self.base_path}/{self.model_name}"
+        return f"{self.base_path}"
 
     def getArgs(self):
         os.makedirs(self.out_dir, exist_ok=True)
