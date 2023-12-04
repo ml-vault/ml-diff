@@ -2,7 +2,7 @@ import subprocess
 import os
 
 def run_cli(args:str):
-    subprocess.call(args.split())
+    subprocess.call(args.split(), shell=True)
 
 def is_model(name:str)->bool:
     _, ext = os.path.splitext(name)
