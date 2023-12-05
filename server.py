@@ -4,7 +4,7 @@ from runpod.serverless.utils.rp_validator import validate
 from apilib.upload import upload_all_files_to_hf
 from schema import SCHEMAS 
 from apilib.util.env import TEMP_DIR, HF_USER, R_TOKEN
-from apilib.datapack import DataPackLoader, DataPack
+from mlvault.datapack import DataPack, DataPackLoader
 
 
 class ValidateError(Exception):

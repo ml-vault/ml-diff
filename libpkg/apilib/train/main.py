@@ -3,7 +3,7 @@ import os
 from time import sleep
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
-from ..datapack import DataPack
+from mlvault.datapack import DataPack
 from ..util import run_cli
 import subprocess
 from ..util.env import HF_USER, SKIP_PROC, SDXL
