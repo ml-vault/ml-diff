@@ -118,7 +118,7 @@ class TrainConfig:
             _, _, model_name = self.continue_from.split("/",2)
             base_dir = os.path.dirname(self.config_file_path)
             continue_dir = f"{base_dir}/continue_from/{model_name}"
-            return f"--continue_from {continue_dir}"
+            return f"--network_weights {continue_dir}"
 
 class SampleConfig:
     sampler: str
