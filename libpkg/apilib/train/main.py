@@ -99,8 +99,7 @@ class TrainConfig:
         pass
 
     def getArgs(self) -> str:
-        network_weight = f"--network_weight {self.continue_from} " if self.continue_from else ""
-        dynamic = f"{network_weight}"
+        dynamic = f"{self.get_continue_from_arg()}"
         return f"--dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --max_train_epochs {self.max_train_epochs} \
@@ -112,6 +111,14 @@ class TrainConfig:
         --network_module {self.network_module} \
         --max_data_loader_n_workers {self.max_data_loader_n_workers} \
         {dynamic}"
+    def get_continue_from_arg(self):
+        if not self.continue_from:
+            return ""
+        else:
+            _, _, model_name = self.continue_from.split("/",2)
+            base_dir = os.path.dirname(self.config_file_path)
+            continue_dir = f"{base_dir}/continue_from/{model_name}"
+            return f"--continue_from {continue_dir}"
 
 class SampleConfig:
     sampler: str
