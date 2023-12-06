@@ -23,8 +23,7 @@ RUN pip install -r ./requirements.txt
 RUN pip install -e ./difflex
 RUN pip install -e ./libpkg
 RUN pip install -U huggingface_hub
-RUN pip install git+https://github.com/ml-vault/py-pkg.git
-RUN pip install datasets
+RUN pip install mlvault==0.0.1
 RUN chmod +x server.py
 ENV HF_DATASETS_CACHE /workspace/.cache/huggingface/
 RUN python ./init.py
