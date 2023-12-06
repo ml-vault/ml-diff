@@ -239,7 +239,7 @@ def train_xl_lora_from_datapack(datapack: DataPack):
         network_dim=datapack.train.network_dim,
         network_alpha=datapack.train.network_alpha,
         mixed_precision="bf16", 
-        continue_from=datapack.train.continue_from
+        continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
     )
     sample_config = SampleConfig(sampler= datapack.sample.sampler, 
                                  sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
