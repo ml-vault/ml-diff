@@ -27,4 +27,4 @@ RUN pip install mlvault==0.0.3
 RUN chmod +x server.py
 ENV HF_DATASETS_CACHE /workspace/.cache/huggingface/
 RUN python ./init.py
-CMD ["python", "server.py"]
+CMD ["sh", "server.sh"]
