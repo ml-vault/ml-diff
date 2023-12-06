@@ -238,7 +238,8 @@ def train_xl_lora_from_datapack(datapack: DataPack):
         learning_rate=datapack.train.learning_rate,
         network_dim=datapack.train.network_dim,
         network_alpha=datapack.train.network_alpha,
-        mixed_precision="bf16"
+        mixed_precision="bf16", 
+        continue_from=datapack.train.continue_from
     )
     sample_config = SampleConfig(sampler= datapack.sample.sampler, 
                                  sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
