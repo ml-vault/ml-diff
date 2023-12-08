@@ -17,25 +17,26 @@ def handler(job):
     try:
         job_input = job["input"] # Access the input from the request.
         func = job_input["fn"] # Access the function name from the input.
-        target_schema = SCHEMAS[func]
-        validated_input = validate(job_input, target_schema) 
+
+        # target_schema = SCHEMAS[func]
+        # validated_input = validate(job_input, target_schema) 
         
-        if 'errors' in validated_input:
-            raise ValidateError(validated_input['errors'])
+        # if 'errors' in validated_input:
+        #     raise ValidateError(validated_input['errors'])
 
         if func == "TRAIN_XL_LORA":
             repo_id = job_input['dataset_repo']
             datapack = DataPackLoader.load_datapack_from_hf(repo_id, R_TOKEN, TEMP_DIR)
             datapack.export_files(TEMP_DIR, R_TOKEN)
-            train_xl_lora_from_datapack(datapack)
             upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
+            train_xl_lora_from_datapack(datapack)
             return "Train completed and uploaded to HF"
         else:
             print("loading dynamic datapack")
             datapack = DataPackLoader.load_dynamic_datapack(job_input, TEMP_DIR)
             datapack.export_files(TEMP_DIR, R_TOKEN)
-            train_xl_lora_from_datapack(datapack)
             upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
+            train_xl_lora_from_datapack(datapack)
             return "Train completed and uploaded to HF"
 
     except ValidateError as e:
