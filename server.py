@@ -25,13 +25,18 @@ def handler(job):
 
         if func == "TRAIN_XL_LORA":
             repo_id = job_input['dataset_repo']
-            datapack:DataPack = DataPackLoader.load_datapack_from_hf(repo_id, R_TOKEN, TEMP_DIR)
+            datapack = DataPackLoader.load_datapack_from_hf(repo_id, R_TOKEN, TEMP_DIR)
             datapack.export_files(TEMP_DIR, R_TOKEN)
             train_xl_lora_from_datapack(datapack)
             upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
             return "Train completed and uploaded to HF"
-
-        return "Unknown function"
+        else:
+            print("loading dynamic datapack")
+            datapack = DataPackLoader.load_dynamic_datapack(job_input, TEMP_DIR)
+            datapack.export_files(TEMP_DIR, R_TOKEN)
+            train_xl_lora_from_datapack(datapack)
+            upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
+            return "Train completed and uploaded to HF"
 
     except ValidateError as e:
         print(e.message)
