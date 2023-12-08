@@ -16,7 +16,7 @@ class ValidateError(Exception):
 def handler(job):
     try:
         job_input = job["input"] # Access the input from the request.
-        func = job_input["fn"] # Access the function name from the input.
+        func = job_input["fn"] if "fn" in job_input else ""
 
         # target_schema = SCHEMAS[func]
         # validated_input = validate(job_input, target_schema) 
