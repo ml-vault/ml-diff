@@ -33,5 +33,9 @@ def upload_models_to_hf(model_name:str, upload_dir:str):
     print("model uploaded!")
 
 def upload_all_files_to_hf(repo_id:str, local_dir:str):
-    create_repo(repo_id,token=W_TOKEN, private=True, exist_ok=True)
-    upload_folder(folder_path=local_dir, repo_id=repo_id, token=W_TOKEN)
+    try:
+        create_repo(repo_id,token=W_TOKEN, private=True, exist_ok=True)
+        upload_folder(folder_path=local_dir, repo_id=repo_id, token=W_TOKEN)
+    except:
+        print("upload to hf failed!")
+        raise

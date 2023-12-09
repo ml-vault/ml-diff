@@ -222,32 +222,35 @@ def train_lora_xl(base_path:str,
 
 
 def train_xl_lora_from_datapack(datapack: DataPack):
-    print("train called")
-    toml_config = datapack.toml_path
-    base_dir = os.path.dirname(toml_config)
-    output_config = OutputConfig(
-        base_path=base_dir,
-        model_name=datapack.output.model_name,
-        save_every_n_epochs=datapack.output.save_every_n_epochs
-    )
-    train_config = TrainConfig(
-        config_file_path=toml_config,
-        pretrained_model_name_or_path=SDXL,
-        max_train_epochs=datapack.train.max_train_epochs,
-        train_batch_size=datapack.train.train_batch_size,
-        learning_rate=datapack.train.learning_rate,
-        network_dim=datapack.train.network_dim,
-        network_alpha=datapack.train.network_alpha,
-        mixed_precision="bf16", 
-        continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
-    )
-    sample_config = SampleConfig(sampler= datapack.sample.sampler, 
-                                 sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
-                                 prompt_path= f"{base_dir}/sample.txt"
-                                 )
-    os.environ["WORKING_REPO"] = f"{HF_USER}/{datapack.output.model_name}"
-    args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
-    cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
-    run_cli(cmd)
-    return
-print("Done!")
+    try:
+        print("train called")
+        toml_config = datapack.toml_path
+        base_dir = os.path.dirname(toml_config)
+        output_config = OutputConfig(
+            base_path=base_dir,
+            model_name=datapack.output.model_name,
+            save_every_n_epochs=datapack.output.save_every_n_epochs
+        )
+        train_config = TrainConfig(
+            config_file_path=toml_config,
+            pretrained_model_name_or_path=SDXL,
+            max_train_epochs=datapack.train.max_train_epochs,
+            train_batch_size=datapack.train.train_batch_size,
+            learning_rate=datapack.train.learning_rate,
+            network_dim=datapack.train.network_dim,
+            network_alpha=datapack.train.network_alpha,
+            mixed_precision="bf16", 
+            continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
+        )
+        sample_config = SampleConfig(sampler= datapack.sample.sampler, 
+                                    sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
+                                    prompt_path= f"{base_dir}/sample.txt"
+                                    )
+        os.environ["WORKING_REPO"] = f"{HF_USER}/{datapack.output.model_name}"
+        args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
+        cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
+        run_cli(cmd)
+        return
+    except:
+        print("train failed!")
+        raise
