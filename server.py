@@ -29,17 +29,15 @@ def handler(job):
 
         if func == "TRAIN_XL_LORA":
             repo_id = job_input['dataset_repo']
-            datapack = DataPackLoader.load_datapack_from_hf(repo_id, R_TOKEN, TEMP_DIR)
-            datapack.export_files(TEMP_DIR, R_TOKEN)
+            datapack = DataPackLoader.load_datapack_from_hf(repo_id, TEMP_DIR)
+            datapack.export_files()
             upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
             train_xl_lora_from_datapack(datapack)
             return "Train completed and uploaded to HF"
         else:
             print("loading dynamic datapack")
-            datapack = DataPackLoader.load_dynamic_datapack(job_input, TEMP_DIR)
-            with open(f'{TEMP_DIR}/input.json', 'w', encoding="utf-8") as f:
-                json.dump(job_input, f, indent=2)
-            datapack.export_files(TEMP_DIR, R_TOKEN)
+            datapack = DataPack(job_input, TEMP_DIR)
+            datapack.export_files()
             upload_all_files_to_hf(f"{HF_USER}/{datapack.output.model_name}", TEMP_DIR)
             train_xl_lora_from_datapack(datapack)
             return "Train completed and uploaded to HF"
@@ -52,6 +50,7 @@ def handler(job):
             }
 
     except Exception as e:
+        print(e)
         return {
             "error": "unknown",
             "message":e.__dict__

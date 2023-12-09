@@ -41,3 +41,4 @@ voluptuous==0.13.1
 wandb==0.15.11
 
 scipy
+packaging
