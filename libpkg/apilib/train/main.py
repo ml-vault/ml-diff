@@ -115,7 +115,7 @@ class TrainConfig:
         if not self.continue_from:
             return ""
         else:
-            _, _, model_name = self.continue_from.split("/",2)
+            _, model_name = self.continue_from.split(":")
             base_dir = os.path.dirname(self.config_file_path)
             continue_dir = f"{base_dir}/continue_from/{model_name}"
             return f"--network_weights {continue_dir}"
