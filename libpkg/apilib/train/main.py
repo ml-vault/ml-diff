@@ -75,13 +75,17 @@ class TrainConfig:
     def __init__(self, config_file_path:str, pretrained_model_name_or_path:str, max_train_epochs:int, train_batch_size:int, learning_rate:float, 
                    mixed_precision: Literal["no", "fp16", "bf16"] = "bf16",
                    continue_from:Optional[str]=None,
-                   max_data_loader_n_workers:int =3000,
-                   prior_loss_weight=1.0) -> None:
+                   max_data_loader_n_workers:int =3000
+                   ) -> None:
         self.config_file_path = config_file_path
-        self.pretrained_model_name_or_path = pretrained_model_name_or_path
+        if ":" in pretrained_model_name_or_path:
+            base_dir = os.path.dirname(config_file_path)
+            _, model_name = pretrained_model_name_or_path.split(":")
+            self.pretrained_model_name_or_path = f"{base_dir}/continue_from/{model_name}"
+        else:
+            self.pretrained_model_name_or_path = pretrained_model_name_or_path 
         self.max_train_epochs = max_train_epochs
         self.train_batch_size = train_batch_size
-        self.prior_loss_weight = prior_loss_weight
         self.learning_rate = learning_rate
         self.mixed_precision = mixed_precision
         self.max_data_loader_n_workers = max_data_loader_n_workers
@@ -94,17 +98,27 @@ class TrainConfig:
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --max_train_epochs {self.max_train_epochs} \
         --train_batch_size {self.train_batch_size} \
-        --prior_loss_weight {self.prior_loss_weight} \
         --learning_rate {self.learning_rate} \
         --mixed_precision {self.mixed_precision} \
         --max_data_loader_n_workers {self.max_data_loader_n_workers}"
 
+    @property
+    def model(self):
+        if not self.continue_from:
+            return self.pretrained_model_name_or_path
+        else:
+            _, model_name = self.continue_from.split(":")
+            base_dir = os.path.dirname(self.config_file_path)
+            continue_dir = f"{base_dir}/continue_from/{model_name}"
+            return continue_dir
+
 class TrainNetworkConfig(TrainConfig):
     def __init__(self, config_file_path: str, pretrained_model_name_or_path: str, max_train_epochs: int, train_batch_size: int, learning_rate: float, network_dim: int, network_alpha: int, mixed_precision: Literal['no', 'fp16', 'bf16'] = "bf16", network_module: Literal['networks.lora', 'lycoris.kohya'] = "networks.lora", continue_from: str | None = None, max_data_loader_n_workers: int = 3000, prior_loss_weight=1) -> None:
-        super().__init__(config_file_path, pretrained_model_name_or_path, max_train_epochs, train_batch_size, learning_rate, mixed_precision, continue_from, max_data_loader_n_workers, prior_loss_weight)
+        super().__init__(config_file_path, pretrained_model_name_or_path, max_train_epochs, train_batch_size, learning_rate, mixed_precision, continue_from, max_data_loader_n_workers)
         self.network_alpha = network_alpha
         self.network_dim = network_dim
         self.network_module = network_module
+        self.prior_loss_weight = prior_loss_weight
     def getArgs(self) -> str:
         dynamic = f"{self.get_continue_from_arg()}"
         return f"--dataset_config {self.config_file_path} \
