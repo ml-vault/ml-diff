@@ -27,5 +27,4 @@ RUN pip install mlvault==0.0.17
 RUN chmod +x server.py
 ENV HF_DATASETS_CACHE /workspace/.cache/huggingface/
 RUN python ./init.py
-RUN cp "./runpod.yaml" "/root/.cache/huggingface/accelerate/default_config.yaml"
 CMD ["sh", "server.sh"]
