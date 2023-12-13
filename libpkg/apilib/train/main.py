@@ -2,7 +2,10 @@ sd_scripts_path = "/workspace/difflex"
 import os
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
+from apilib.util.env.main import MODEL_DIR
 from mlvault.datapack import DataPack
+from mlvault.api import download_file_from_hf
+from mlvault.config import get_r_token
 from ..util import run_cli
 from ..util.env import HF_USER, SDXL
 
@@ -76,68 +79,45 @@ class TrainConfig:
     mixed_precision:str
     max_data_loader_n_workers:int
     config_file_path:str
-    continue_from:Optional[str]
     def __init__(self, config_file_path:str, pretrained_model_name_or_path:str,  train_batch_size:int, learning_rate:float, 
                    mixed_precision: Literal["no", "fp16", "bf16"] = "bf16",
-                   continue_from:Optional[str]=None,
                    max_data_loader_n_workers:int =3000,
                    max_train_epochs:int|None = None,
                    max_train_steps:int|None = None
                    ) -> None:
         self.config_file_path = config_file_path
-        if ":" in pretrained_model_name_or_path:
-            base_dir = os.path.dirname(config_file_path)
-            _, model_name = pretrained_model_name_or_path.split(":")
-            self.pretrained_model_name_or_path = f"{base_dir}/continue_from/{model_name}"
-        else:
-            self.pretrained_model_name_or_path = pretrained_model_name_or_path 
+        self.pretrained_model_name_or_path = pretrained_model_name_or_path 
         self.max_train_epochs = max_train_epochs
         self.max_train_steps = max_train_steps
         self.train_batch_size = train_batch_size
         self.learning_rate = learning_rate
         self.mixed_precision = mixed_precision
         self.max_data_loader_n_workers = max_data_loader_n_workers
-        self.continue_from = continue_from
         print("train config done!")
         pass
 
     def getArgs(self) -> str:
-        dynamic = ""
-        if self.max_train_steps:
-            dynamic = f"--max_train_steps {self.max_train_steps} "
-        if self.max_train_epochs:
-            dynamic = f"--max_train_epochs {self.max_train_epochs} "
         return f"--dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --max_train_epochs {self.max_train_epochs} \
         --train_batch_size {self.train_batch_size} \
         --learning_rate {self.learning_rate} \
         --mixed_precision {self.mixed_precision} \
-        --max_data_loader_n_workers {self.max_data_loader_n_workers} {dynamic}"
-
-    @property
-    def model(self):
-        if not self.continue_from:
-            return self.pretrained_model_name_or_path
-        else:
-            _, model_name = self.continue_from.split(":")
-            base_dir = os.path.dirname(self.config_file_path)
-            continue_dir = f"{base_dir}/continue_from/{model_name}"
-            return continue_dir
+        --max_data_loader_n_workers {self.max_data_loader_n_workers} \
+        --max_train_epochs {self.max_train_epochs}"
 
 class TrainNetworkConfig(TrainConfig):
     def __init__(self, config_file_path: str, pretrained_model_name_or_path: str, max_train_epochs: int|None, max_train_steps:int|None, train_batch_size: int, learning_rate: float, network_dim: int, network_alpha: int, mixed_precision: Literal['no', 'fp16', 'bf16'] = "bf16", network_module: Literal['networks.lora', 'lycoris.kohya'] = "networks.lora", continue_from: str | None = None, max_data_loader_n_workers: int = 3000, prior_loss_weight=1) -> None:
-        super().__init__(config_file_path, pretrained_model_name_or_path, train_batch_size, learning_rate, mixed_precision, continue_from, max_data_loader_n_workers, max_train_epochs=max_train_epochs, max_train_steps=max_train_steps)
+        super().__init__(config_file_path, pretrained_model_name_or_path, train_batch_size, learning_rate, mixed_precision, max_data_loader_n_workers, max_train_epochs=max_train_epochs, max_train_steps=max_train_steps)
         self.network_alpha = network_alpha
         self.network_dim = network_dim
         self.network_module = network_module
         self.prior_loss_weight = prior_loss_weight
+        self.continue_from = continue_from
     def getArgs(self) -> str:
-        dynamic = f"{self.get_continue_from_arg()} "
-        if self.max_train_steps:
-            dynamic = f"--max_train_steps {self.max_train_steps} "
-        if self.max_train_epochs:
-            dynamic = f"--max_train_epochs {self.max_train_epochs} "
+        dynamic = ""
+        if self.continue_from:
+            return f"--network_weights {self.continue_from} "
         return f"--dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --train_batch_size {self.train_batch_size} \
@@ -147,16 +127,7 @@ class TrainNetworkConfig(TrainConfig):
         --mixed_precision {self.mixed_precision} \
         --network_module {self.network_module} \
         --max_data_loader_n_workers {self.max_data_loader_n_workers} \
-        {dynamic}"
-
-    def get_continue_from_arg(self):
-        if not self.continue_from:
-            return ""
-        else:
-            _, model_name = self.continue_from.split(":")
-            base_dir = os.path.dirname(self.config_file_path)
-            continue_dir = f"{base_dir}/continue_from/{model_name}"
-            return f"--network_weights {continue_dir}"
+        --max_train_epochs {self.max_train_epochs} {dynamic}"
 
 class SampleConfig:
     sampler: str
@@ -190,6 +161,17 @@ def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, op
     sample_args = sample_config.getArgs() if sample_config else ""
     args = f"{basic_args} {train_args} {output_args} {opt_args} {sample_args}"
     return args
+    
+def resolve_model_name(model_name:str):
+    if ":" in model_name:
+        print("downloading model from hf")
+        repo_id, model_name = model_name.split(":")
+        model_path = os.path.join(MODEL_DIR, model_name)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        download_file_from_hf(repo_id=repo_id, file_name=model_name, local_dir=os.path.join(MODEL_DIR, model_name), r_token=get_r_token())
+        return model_path
+    else:
+        return model_name
 
 def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
     try:
@@ -204,7 +186,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
         )
         train_config = TrainNetworkConfig(
             config_file_path=toml_config,
-            pretrained_model_name_or_path=SDXL,
+            pretrained_model_name_or_path=resolve_model_name(job_input['train'].get('pretrained_model_name_or_path', SDXL)),
             max_train_epochs=job_input['train'].get('max_train_epochs', None),
             max_train_steps=job_input['train'].get('max_train_steps', None),
             train_batch_size=job_input['train'].get('train_batch_size', 1),
@@ -212,7 +194,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
             network_dim=job_input['train'].get('network_dim', 1),
             network_alpha=job_input['train'].get('network_alpha', 1),
             mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
-            continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
+            continue_from=job_input['train'].get('continue_from', None)
         )
         sample_config = SampleConfig(sampler= job_input['sample']['sampler'],
                                     sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
@@ -240,13 +222,12 @@ def train_xl_model(datapack: DataPack, job_input:dict):
         )
         train_config = TrainConfig(
             config_file_path=toml_config,
-            pretrained_model_name_or_path=SDXL,
+            pretrained_model_name_or_path=resolve_model_name(job_input['train'].get('pretrained_model_name_or_path', SDXL)),
             max_train_epochs=job_input['train'].get('max_train_epochs', None),
             max_train_steps=job_input['train'].get('max_train_steps', None),
             train_batch_size=job_input['train'].get('train_batch_size', 1),
             learning_rate=job_input['train'].get('learning_rate', 1e-4),
             mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
-            continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
         sample_config = SampleConfig(sampler=job_input['sample']['sampler'],
                                     sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
