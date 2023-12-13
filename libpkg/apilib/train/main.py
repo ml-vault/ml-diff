@@ -194,7 +194,6 @@ def train_xl_lora_from_datapack(datapack: DataPack):
                                     sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
-        os.environ["WORKING_REPO"] = f"{HF_USER}/{datapack.output.model_name}"
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
         cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
         run_cli(cmd)
@@ -226,7 +225,6 @@ def train_xl_model(datapack: DataPack):
                                     sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
-        os.environ["WORKING_REPO"] = f"{HF_USER}/{datapack.output.model_name}"
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
         cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train.py {args}"
         run_cli(cmd)
