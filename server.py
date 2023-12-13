@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from apilib.train import train_xl_lora_from_datapack, train_xl_model
 from apilib.train.main import resolve_model_name
 import runpod
@@ -7,6 +8,7 @@ from apilib.util.env import TEMP_DIR, DOWNLOAD_DIR, MODEL_DIR
 from mlvault.datapack import DataPack
 from mlvault.config import get_w_token
 from huggingface_hub import create_repo, upload_folder
+import yaml
 
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -21,6 +23,12 @@ class ValidateError(Exception):
 
 def handler(job):
     try:
+        with open("runpod.yaml", "r") as f:
+            config = yaml.safe_load(f)
+            config['mixed_precision'] = job['input']['mixed_precision']
+            with open("/root/.cache/huggingface/accelerate/default_config.yaml", "w") as fw:
+                yaml.dump(config, fw)
+
         job_input = job["input"] # Access the input from the request.
         working_repo = job_input["working_repo"] if "working_repo" in job_input else ""
         repo_dir = job_input['output']['model_name']
