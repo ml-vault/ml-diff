@@ -1,5 +1,4 @@
 sd_scripts_path = "/workspace/difflex"
-import time
 import os
 from huggingface_hub import hf_hub_download
 from typing import Literal, Optional
@@ -165,12 +164,10 @@ def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, op
     
 def resolve_model_name(model_name:str):
     if ":" in model_name:
-        os.makedirs(DOWNLOAD_DIR)
+        os.makedirs(DOWNLOAD_DIR, True)
         print("downloading model from hf")
         repo_id, model_path_in_repo = model_name.split(":")
-        subdir = os.path.dirname(model_path_in_repo) or None
-        filename = os.path.basename(model_path_in_repo)
-        downloaded = hf_hub_download(repo_id=repo_id,  filename=filename, subfolder=subdir, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
+        downloaded = hf_hub_download(repo_id=repo_id,  filename=model_path_in_repo, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
         print(f"downloaded model to {downloaded}")
         return downloaded
     else:
