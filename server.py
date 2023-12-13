@@ -32,9 +32,9 @@ def handler(job):
         create_repo(working_repo,token=get_w_token(), private=True, exist_ok=True)
         upload_folder(folder_path=local_work_dir, repo_id=working_repo, path_in_repo=repo_dir, token=get_w_token())
         if work_type == "TRAIN_XL_LORA":
-            train_xl_lora_from_datapack(datapack)
+            train_xl_lora_from_datapack(datapack, job_input)
         elif work_type == "TRAIN_XL":
-            train_xl_model(datapack)
+            train_xl_model(datapack, job_input)
         else:
             raise Exception("unknown work type")
         return "Train completed and uploaded to HF"

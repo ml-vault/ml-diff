@@ -15,13 +15,13 @@ def done():
 class OutputConfig:
     base_path:str
     model_name:str
-    save_every_n_epochs:int
     save_model_as:str
 
-    def __init__(self, base_path:str, model_name:str, save_every_n_epochs:int, save_model_as: Literal["safetensors", "ckpt"] = "safetensors"):
+    def __init__(self, base_path:str, model_name:str, save_every_n_epochs:int|None = None, save_every_n_steps:int|None = None, save_model_as: Literal["safetensors", "ckpt"] = "safetensors"):
         self.base_path = base_path
         self.model_name = model_name
         self.save_every_n_epochs = save_every_n_epochs
+        self.save_every_n_steps = save_every_n_steps
         self.save_model_as = save_model_as
         print("output config done!")
         pass
@@ -31,11 +31,15 @@ class OutputConfig:
         return f"{self.base_path}"
 
     def getArgs(self):
+        dynamic = ""
+        if self.save_every_n_epochs:
+            dynamic = f"--save_every_n_epochs {self.save_every_n_epochs} "
+        if self.save_every_n_steps:
+            dynamic = f"--save_every_n_steps {self.save_every_n_steps} "
         os.makedirs(self.out_dir, exist_ok=True)
         return f"--output_dir {self.out_dir} \
         --output_name {self.model_name} \
-        --save_every_n_epochs {self.save_every_n_epochs} \
-        --save_model_as {self.save_model_as}"
+        --save_model_as {self.save_model_as} {dynamic}"
 
 class OptimizerConfig(metaclass=ABCMeta):
     optimizer_type:str
@@ -144,20 +148,26 @@ class TrainNetworkConfig(TrainConfig):
 
 class SampleConfig:
     sampler: str
-    sample_every_n_epochs:int
     prompt_path:str
     def __init__(self,
                sampler: Literal['ddim', 'pndm', 'lms', 'euler', 'euler_a', 'heun', 'dpm_2', 'dpm_2_a', 'dpmsolver', 'dpmsolver++', 'dpmsingle', 'k_lms', 'k_euler', 'k_euler_a', 'k_dpm_2', 'k_dpm_2_a'],
-               sample_every_n_epochs:int,
-               prompt_path:str
+               prompt_path:str,
+               sample_every_n_epochs:int|None = None,
+               sample_every_n_steps:int|None = None,
                ) -> None:
         self.sampler = sampler
         self.sample_every_n_epochs = sample_every_n_epochs
+        self.sample_every_n_steps = sample_every_n_steps
         self.prompt_path = prompt_path
         print("sample config done!")
         pass
     def getArgs(self) -> str:
-        return f"--sample_every_n_epochs {self.sample_every_n_epochs} --sample_prompts {self.prompt_path} --sample_sampler {self.sampler}"
+        dynamic = ""
+        if self.sample_every_n_epochs:
+            dynamic = f"--sample_every_n_epochs {self.sample_every_n_epochs} "
+        if self.sample_every_n_steps:
+            dynamic = f"--sample_every_n_steps {self.sample_every_n_steps} "
+        return f"{dynamic} --sample_prompts {self.prompt_path} --sample_sampler {self.sampler}"
 
 def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, optimizer_config:OptimizerConfig, sample_config:Optional[SampleConfig] = None):
    
@@ -169,7 +179,7 @@ def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, op
     args = f"{basic_args} {train_args} {output_args} {opt_args} {sample_args}"
     return args
 
-def train_xl_lora_from_datapack(datapack: DataPack):
+def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
     try:
         print("Train lora for sdxl")
         toml_config = datapack.toml_path
@@ -177,7 +187,8 @@ def train_xl_lora_from_datapack(datapack: DataPack):
         output_config = OutputConfig(
             base_path=base_dir,
             model_name=datapack.output.model_name,
-            save_every_n_epochs=datapack.output.save_every_n_epochs
+            save_every_n_epochs=job_input['output'].get('save_every_n_epochs', None),
+            save_every_n_steps=job_input['output'].get('save_every_n_steps', None)
         )
         train_config = TrainNetworkConfig(
             config_file_path=toml_config,
@@ -191,7 +202,8 @@ def train_xl_lora_from_datapack(datapack: DataPack):
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
         sample_config = SampleConfig(sampler= datapack.sample.sampler, 
-                                    sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
+                                    sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
+                                    sample_every_n_epochs=job_input['sample'].get('sample_every_n_epochs', None),
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
@@ -202,7 +214,7 @@ def train_xl_lora_from_datapack(datapack: DataPack):
         print("train failed!")
         raise
 
-def train_xl_model(datapack: DataPack):
+def train_xl_model(datapack: DataPack, job_input:dict):
     try:
         print("train model for sdxl")
         toml_config = datapack.toml_path
@@ -210,19 +222,21 @@ def train_xl_model(datapack: DataPack):
         output_config = OutputConfig(
             base_path=base_dir,
             model_name=datapack.output.model_name,
-            save_every_n_epochs=datapack.output.save_every_n_epochs
+            save_every_n_epochs=job_input['output'].get('save_every_n_epochs', None),
+            save_every_n_steps=job_input['output'].get('save_every_n_steps', None)
         )
         train_config = TrainConfig(
             config_file_path=toml_config,
             pretrained_model_name_or_path=SDXL,
-            max_train_epochs=datapack.train.max_train_epochs,
-            train_batch_size=datapack.train.train_batch_size,
-            learning_rate=datapack.train.learning_rate,
-            mixed_precision=datapack.train.mixed_precision, 
+            max_train_epochs=job_input['train'].get('max_train_epochs', 1),
+            train_batch_size=job_input['train'].get('train_batch_size', 1),
+            learning_rate=job_input['train'].get('learning_rate', 1e-4),
+            mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
         sample_config = SampleConfig(sampler= datapack.sample.sampler, 
-                                    sample_every_n_epochs=datapack.sample.sample_every_n_epochs, 
+                                    sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
+                                    sample_every_n_epochs=job_input['sample'].get('sample_every_n_epochs', None),
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
