@@ -1,13 +1,13 @@
 sd_scripts_path = "/workspace/difflex"
 import os
+from huggingface_hub import hf_hub_download
 from typing import Literal, Optional
 from abc import ABCMeta, abstractmethod
-from apilib.util.env.main import MODEL_DIR
+from apilib.util.env.main import DOWNLOAD_DIR
 from mlvault.datapack import DataPack
-from mlvault.api import download_file_from_hf
 from mlvault.config import get_r_token
 from ..util import run_cli
-from ..util.env import HF_USER, SDXL
+from ..util.env import SDXL
 
 
 alpha = "abcdefghijklmnopqrstuvwxyz"
@@ -164,13 +164,14 @@ def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, op
     
 def resolve_model_name(model_name:str):
     if ":" in model_name:
+        os.makedirs(DOWNLOAD_DIR)
         print("downloading model from hf")
-        repo_id, model_name = model_name.split(":")
-        model_path = os.path.join(MODEL_DIR, model_name)
-        model_dir = os.path.dirname(model_path)
-        os.makedirs(model_dir, exist_ok=True)
-        download_file_from_hf(repo_id=repo_id, file_name=model_name, local_dir=os.path.join(model_dir), r_token=get_r_token(),)
-        return model_path
+        repo_id, model_path_in_repo = model_name.split(":")
+        subdir = os.path.dirname(model_path_in_repo) or None
+        filename = os.path.basename(model_path_in_repo)
+        local_model_path = os.path.join(DOWNLOAD_DIR, filename)
+        hf_hub_download(repo_id=repo_id,  filename=filename, subfolder=subdir, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
+        return local_model_path
     else:
         return model_name
 
