@@ -187,7 +187,7 @@ def train_xl_lora_from_datapack(datapack: DataPack):
             learning_rate=datapack.train.learning_rate,
             network_dim=datapack.train.network_dim,
             network_alpha=datapack.train.network_alpha,
-            mixed_precision="bf16", 
+            mixed_precision=datapack.train.mixed_precision, 
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
         sample_config = SampleConfig(sampler= datapack.sample.sampler, 
@@ -195,7 +195,7 @@ def train_xl_lora_from_datapack(datapack: DataPack):
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
-        cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train_network.py {args}"
+        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train_network.py {args}"
         run_cli(cmd)
         return
     except:
@@ -218,7 +218,7 @@ def train_xl_model(datapack: DataPack):
             max_train_epochs=datapack.train.max_train_epochs,
             train_batch_size=datapack.train.train_batch_size,
             learning_rate=datapack.train.learning_rate,
-            mixed_precision="bf16", 
+            mixed_precision=datapack.train.mixed_precision, 
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
         sample_config = SampleConfig(sampler= datapack.sample.sampler, 
@@ -226,7 +226,7 @@ def train_xl_model(datapack: DataPack):
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
-        cmd = f"accelerate launch --mixed_precision bf16 {sd_scripts_path}/sdxl_train.py {args}"
+        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train.py {args}"
         run_cli(cmd)
     except:
         print("train failed!")
