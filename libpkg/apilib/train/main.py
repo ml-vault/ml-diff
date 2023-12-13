@@ -167,8 +167,9 @@ def resolve_model_name(model_name:str):
         print("downloading model from hf")
         repo_id, model_name = model_name.split(":")
         model_path = os.path.join(MODEL_DIR, model_name)
-        os.makedirs(os.path.dirname(model_path), exist_ok=True)
-        download_file_from_hf(repo_id=repo_id, file_name=model_name, local_dir=os.path.join(MODEL_DIR, model_name), r_token=get_r_token())
+        model_dir = os.path.dirname(model_path)
+        os.makedirs(model_dir, exist_ok=True)
+        download_file_from_hf(repo_id=repo_id, file_name=model_name, local_dir=os.path.join(model_dir), r_token=get_r_token(),)
         return model_path
     else:
         return model_name
