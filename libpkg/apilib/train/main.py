@@ -164,7 +164,7 @@ def gen_train_lora_args(train_config:TrainConfig, output_config:OutputConfig, op
     
 def resolve_model_name(model_name:str):
     if ":" in model_name:
-        os.makedirs(DOWNLOAD_DIR, True)
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True)
         print("downloading model from hf")
         repo_id, model_path_in_repo = model_name.split(":")
         downloaded = hf_hub_download(repo_id=repo_id,  filename=model_path_in_repo, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
