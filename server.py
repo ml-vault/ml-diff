@@ -1,3 +1,4 @@
+import json
 import os
 from apilib.train import train_xl_lora_from_datapack, train_xl_model
 import runpod
@@ -24,6 +25,8 @@ def handler(job):
         os.makedirs(local_work_dir, exist_ok=True)
         print("loading dynamic datapack")
         work_type = job_input['type']
+        with open(os.path.join(local_work_dir, "job_input.json"), "w") as f:
+            json.dump(job_input, f, indent=4)
         datapack = DataPack(job_input, local_work_dir)
         datapack.export_files()
         create_repo(working_repo,token=get_w_token(), private=True, exist_ok=True)
