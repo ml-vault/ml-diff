@@ -33,9 +33,9 @@ def handler(job):
             json.dump(job_input, f, indent=4)
         print("wrote input jons")
         datapack = DataPack(job_input, local_work_dir)
-        datapack.export_files()
+        # datapack.export_files()
         create_repo(working_repo,token=get_w_token(), private=True, exist_ok=True)
-        upload_folder(folder_path=local_work_dir, repo_id=working_repo, path_in_repo=repo_dir, token=get_w_token(), ignore_patterns=["continue_from", "datasets"])
+        # upload_folder(folder_path=local_work_dir, repo_id=working_repo, path_in_repo=repo_dir, token=get_w_token())
         if work_type == "TRAIN_XL_LORA":
             train_xl_lora_from_datapack(datapack, job_input)
         elif work_type == "TRAIN_XL":
