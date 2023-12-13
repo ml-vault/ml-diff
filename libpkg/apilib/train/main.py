@@ -198,7 +198,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
         base_dir = os.path.dirname(toml_config)
         output_config = OutputConfig(
             base_path=base_dir,
-            model_name=datapack.output.model_name,
+            model_name=job_input['output']['model_name'],
             save_every_n_epochs=job_input['output'].get('save_every_n_epochs', None),
             save_every_n_steps=job_input['output'].get('save_every_n_steps', None)
         )
@@ -207,14 +207,14 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
             pretrained_model_name_or_path=SDXL,
             max_train_epochs=job_input['train'].get('max_train_epochs', None),
             max_train_steps=job_input['train'].get('max_train_steps', None),
-            train_batch_size=datapack.train.train_batch_size,
-            learning_rate=datapack.train.learning_rate,
-            network_dim=datapack.train.network_dim,
-            network_alpha=datapack.train.network_alpha,
-            mixed_precision=datapack.train.mixed_precision, 
+            train_batch_size=job_input['train'].get('train_batch_size', 1),
+            learning_rate=job_input['train'].get('learning_rate', 1e-4),
+            network_dim=job_input['train'].get('network_dim', 1),
+            network_alpha=job_input['train'].get('network_alpha', 1),
+            mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
-        sample_config = SampleConfig(sampler= datapack.sample.sampler, 
+        sample_config = SampleConfig(sampler= job_input['sample']['sampler'],
                                     sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
                                     sample_every_n_epochs=job_input['sample'].get('sample_every_n_epochs', None),
                                     prompt_path= f"{base_dir}/sample.txt"
@@ -234,7 +234,7 @@ def train_xl_model(datapack: DataPack, job_input:dict):
         base_dir = os.path.dirname(toml_config)
         output_config = OutputConfig(
             base_path=base_dir,
-            model_name=datapack.output.model_name,
+            model_name=job_input['output']['model_name'],
             save_every_n_epochs=job_input['output'].get('save_every_n_epochs', None),
             save_every_n_steps=job_input['output'].get('save_every_n_steps', None)
         )
@@ -248,7 +248,7 @@ def train_xl_model(datapack: DataPack, job_input:dict):
             mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
             continue_from=datapack.train.continue_from if "continue_from" in dir(datapack.train) else None
         )
-        sample_config = SampleConfig(sampler= datapack.sample.sampler, 
+        sample_config = SampleConfig(sampler=job_input['sample']['sampler'],
                                     sample_every_n_steps=job_input['sample'].get('sample_every_n_steps', None),
                                     sample_every_n_epochs=job_input['sample'].get('sample_every_n_epochs', None),
                                     prompt_path= f"{base_dir}/sample.txt"

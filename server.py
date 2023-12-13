@@ -27,6 +27,7 @@ def handler(job):
         work_type = job_input['type']
         with open(os.path.join(local_work_dir, "job_input.json"), "w") as f:
             json.dump(job_input, f, indent=4)
+        print("wrote input jons")
         datapack = DataPack(job_input, local_work_dir)
         datapack.export_files()
         create_repo(working_repo,token=get_w_token(), private=True, exist_ok=True)
