@@ -68,7 +68,8 @@ class AdaFactorConfig(OptimizerConfig):
 
 class TrainConfig:
     pretrained_model_name_or_path:str
-    max_train_epochs:int
+    max_train_epochs:int |None
+    max_train_steps:int| None
     train_batch_size:int
     prior_loss_weight:float
     learning_rate:float
@@ -76,10 +77,12 @@ class TrainConfig:
     max_data_loader_n_workers:int
     config_file_path:str
     continue_from:Optional[str]
-    def __init__(self, config_file_path:str, pretrained_model_name_or_path:str, max_train_epochs:int, train_batch_size:int, learning_rate:float, 
+    def __init__(self, config_file_path:str, pretrained_model_name_or_path:str,  train_batch_size:int, learning_rate:float, 
                    mixed_precision: Literal["no", "fp16", "bf16"] = "bf16",
                    continue_from:Optional[str]=None,
-                   max_data_loader_n_workers:int =3000
+                   max_data_loader_n_workers:int =3000,
+                   max_train_epochs:int|None = None,
+                   max_train_steps:int|None = None
                    ) -> None:
         self.config_file_path = config_file_path
         if ":" in pretrained_model_name_or_path:
@@ -89,6 +92,7 @@ class TrainConfig:
         else:
             self.pretrained_model_name_or_path = pretrained_model_name_or_path 
         self.max_train_epochs = max_train_epochs
+        self.max_train_steps = max_train_steps
         self.train_batch_size = train_batch_size
         self.learning_rate = learning_rate
         self.mixed_precision = mixed_precision
@@ -98,13 +102,18 @@ class TrainConfig:
         pass
 
     def getArgs(self) -> str:
+        dynamic = ""
+        if self.max_train_steps:
+            dynamic = f"--max_train_steps {self.max_train_steps} "
+        if self.max_train_epochs:
+            dynamic = f"--max_train_epochs {self.max_train_epochs} "
         return f"--dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --max_train_epochs {self.max_train_epochs} \
         --train_batch_size {self.train_batch_size} \
         --learning_rate {self.learning_rate} \
         --mixed_precision {self.mixed_precision} \
-        --max_data_loader_n_workers {self.max_data_loader_n_workers}"
+        --max_data_loader_n_workers {self.max_data_loader_n_workers} {dynamic}"
 
     @property
     def model(self):
@@ -117,17 +126,20 @@ class TrainConfig:
             return continue_dir
 
 class TrainNetworkConfig(TrainConfig):
-    def __init__(self, config_file_path: str, pretrained_model_name_or_path: str, max_train_epochs: int, train_batch_size: int, learning_rate: float, network_dim: int, network_alpha: int, mixed_precision: Literal['no', 'fp16', 'bf16'] = "bf16", network_module: Literal['networks.lora', 'lycoris.kohya'] = "networks.lora", continue_from: str | None = None, max_data_loader_n_workers: int = 3000, prior_loss_weight=1) -> None:
-        super().__init__(config_file_path, pretrained_model_name_or_path, max_train_epochs, train_batch_size, learning_rate, mixed_precision, continue_from, max_data_loader_n_workers)
+    def __init__(self, config_file_path: str, pretrained_model_name_or_path: str, max_train_epochs: int|None, max_train_steps:int|None, train_batch_size: int, learning_rate: float, network_dim: int, network_alpha: int, mixed_precision: Literal['no', 'fp16', 'bf16'] = "bf16", network_module: Literal['networks.lora', 'lycoris.kohya'] = "networks.lora", continue_from: str | None = None, max_data_loader_n_workers: int = 3000, prior_loss_weight=1) -> None:
+        super().__init__(config_file_path, pretrained_model_name_or_path, train_batch_size, learning_rate, mixed_precision, continue_from, max_data_loader_n_workers, max_train_epochs=max_train_epochs, max_train_steps=max_train_steps)
         self.network_alpha = network_alpha
         self.network_dim = network_dim
         self.network_module = network_module
         self.prior_loss_weight = prior_loss_weight
     def getArgs(self) -> str:
-        dynamic = f"{self.get_continue_from_arg()}"
+        dynamic = f"{self.get_continue_from_arg()} "
+        if self.max_train_steps:
+            dynamic = f"--max_train_steps {self.max_train_steps} "
+        if self.max_train_epochs:
+            dynamic = f"--max_train_epochs {self.max_train_epochs} "
         return f"--dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
-        --max_train_epochs {self.max_train_epochs} \
         --train_batch_size {self.train_batch_size} \
         --network_dim {self.network_dim} --network_alpha {self.network_alpha} \
         --prior_loss_weight {self.prior_loss_weight} \
@@ -193,7 +205,8 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
         train_config = TrainNetworkConfig(
             config_file_path=toml_config,
             pretrained_model_name_or_path=SDXL,
-            max_train_epochs=datapack.train.max_train_epochs,
+            max_train_epochs=job_input['train'].get('max_train_epochs', None),
+            max_train_steps=job_input['train'].get('max_train_steps', None),
             train_batch_size=datapack.train.train_batch_size,
             learning_rate=datapack.train.learning_rate,
             network_dim=datapack.train.network_dim,
@@ -228,7 +241,8 @@ def train_xl_model(datapack: DataPack, job_input:dict):
         train_config = TrainConfig(
             config_file_path=toml_config,
             pretrained_model_name_or_path=SDXL,
-            max_train_epochs=job_input['train'].get('max_train_epochs', 1),
+            max_train_epochs=job_input['train'].get('max_train_epochs', None),
+            max_train_steps=job_input['train'].get('max_train_steps', None),
             train_batch_size=job_input['train'].get('train_batch_size', 1),
             learning_rate=job_input['train'].get('learning_rate', 1e-4),
             mixed_precision=job_input['train'].get('mixed_precision', "bf16"),
