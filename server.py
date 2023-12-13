@@ -2,10 +2,14 @@ import json
 import os
 from apilib.train import train_xl_lora_from_datapack, train_xl_model
 import runpod
-from apilib.util.env import TEMP_DIR, HF_USER
-from mlvault.datapack import DataPack, DataPackLoader
+from apilib.util.env import TEMP_DIR, DOWNLOAD_DIR, MODEL_DIR
+from mlvault.datapack import DataPack
 from mlvault.config import get_w_token
-from huggingface_hub import upload_file, create_repo, file_exists, repo_exists, upload_folder
+from huggingface_hub import create_repo, upload_folder
+
+os.makedirs(TEMP_DIR, exist_ok=True)
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 
 class ValidateError(Exception):

@@ -169,9 +169,9 @@ def resolve_model_name(model_name:str):
         repo_id, model_path_in_repo = model_name.split(":")
         subdir = os.path.dirname(model_path_in_repo) or None
         filename = os.path.basename(model_path_in_repo)
-        local_model_path = os.path.join(DOWNLOAD_DIR, filename)
-        hf_hub_download(repo_id=repo_id,  filename=filename, subfolder=subdir, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
-        return local_model_path
+        downloaded = hf_hub_download(repo_id=repo_id,  filename=filename, subfolder=subdir, force_download=True, local_dir=DOWNLOAD_DIR, token=get_r_token(), local_dir_use_symlinks=False)
+        print(f"downloaded model to {downloaded}")
+        return downloaded
     else:
         return model_name
 
