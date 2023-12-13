@@ -1,8 +1,12 @@
 import subprocess
 import os
+from time import sleep
+from apilib.util.env import SLEEP_TIME
 
 def run_cli(args:str):
     print(f"run cli: {args}")
+    print(f"sleep {SLEEP_TIME} seconds")
+    sleep(SLEEP_TIME)
     subprocess.call(args, shell=True)
 
 def is_model(name:str)->bool:

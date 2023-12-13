@@ -1,4 +1,5 @@
 sd_scripts_path = "/workspace/difflex"
+import time
 import os
 from huggingface_hub import hf_hub_download
 from typing import Literal, Optional
