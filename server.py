@@ -23,12 +23,13 @@ class ValidateError(Exception):
 
 def handler(job):
     try:
+        print("started")
         with open("runpod.yaml", "r") as f:
             config = yaml.safe_load(f)
-            config['mixed_precision'] = job['input']['mixed_precision']
+            config['mixed_precision'] = job['input']['train']['mixed_precision']
+            os.makedirs("/root/.cache/huggingface/accelerate/", exist_ok=True)
             with open("/root/.cache/huggingface/accelerate/default_config.yaml", "w") as fw:
                 yaml.dump(config, fw)
-
         job_input = job["input"] # Access the input from the request.
         working_repo = job_input["working_repo"] if "working_repo" in job_input else ""
         repo_dir = job_input['output']['model_name']
