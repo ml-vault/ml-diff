@@ -58,7 +58,7 @@ def handler(job):
         print(e)
         return {
             "error": "unknown",
-            "message":e.__dict__
+            "message":repr(e)
         }
 
         

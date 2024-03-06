@@ -9,3 +9,4 @@ _tmp
 .apikey
 _models
 ve.*
+.DS_Store
