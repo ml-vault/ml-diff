@@ -21,19 +21,19 @@ class ValidateError(Exception):
         self.message = message
     pass
 
-def handler(job):
+def handler(job_input):
     try:
         print("started")
-        if "input" not in job:
+        if "input" not in job_input:
             raise ValidateError("input is required")
-        if "type" not in job["input"]:
+        if "type" not in job_input:
             raise ValidateError("type is required")
-        if "train" not in job["input"]:
+        if "train" not in job_input:
             raise ValidateError("train is required")
         if os.path.exists("runpod.yaml"):
             with open("runpod.yaml", "r") as f:
                 config = yaml.safe_load(f)
-                config['mixed_precision'] = job['input']['train']['mixed_precision']
+                config['mixed_precision'] = job_input['train']['mixed_precision']
                 os.makedirs("/root/.cache/huggingface/accelerate/", exist_ok=True)
                 is_existing = os.path.exists("/root/.cache/huggingface/accelerate/default_config.yaml")
                 if not is_existing:
@@ -44,7 +44,6 @@ def handler(job):
         else:
             print("runpod.yaml not found")
         
-        job_input = job["input"] # Access the input from the request.
         working_repo = job_input["working_repo"] if "working_repo" in job_input else ""
         repo_dir = job_input['output']['model_name']
         os.environ["WORKING_REPO"] = working_repo
