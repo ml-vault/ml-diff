@@ -21,7 +21,8 @@ class ValidateError(Exception):
         self.message = message
     pass
 
-def handler(job_input):
+def handler(payload):
+    job_input = payload['input']
     try:
         print("started")
         if "input" not in job_input:
@@ -68,7 +69,6 @@ def handler(job_input):
         return "Train completed and uploaded to HF"
 
     except Exception as e:
-        print(e)
         return {
             "error": "unknown",
             "message":repr(e)
