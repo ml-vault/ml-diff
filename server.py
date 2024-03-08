@@ -36,12 +36,10 @@ def handler(payload):
                 config = yaml.safe_load(f)
                 config['mixed_precision'] = job_input['train']['mixed_precision']
                 os.makedirs("/root/.cache/huggingface/accelerate/", exist_ok=True)
-                is_existing = os.path.exists("/root/.cache/huggingface/accelerate/default_config.yaml")
-                if not is_existing:
-                    with open("/root/.cache/huggingface/accelerate/default_config.yaml", "w") as fw:
-                        yaml.dump(config, fw)
-                else:
-                    print("default_config.yaml already exists")
+                with open("/root/.cache/huggingface/accelerate/default_config.yaml", "w") as fw:
+                    print("writing default_config.yaml")
+                    yaml.dump(config, fw)
+                    fw.close()
         else:
             print("runpod.yaml not found")
         
