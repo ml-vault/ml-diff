@@ -118,7 +118,7 @@ class TrainNetworkConfig(TrainConfig):
         dynamic = ""
         continue_from = ""
         if self.continue_from:
-            continue_from = f"--network_weights {self.continue_from}"
+            continue_from = f"--network_weights {resolve_model_name(self.continue_from)}"
         return f"{continue_from} --dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --train_batch_size {self.train_batch_size} \
