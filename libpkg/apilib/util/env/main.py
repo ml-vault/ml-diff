@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TEMP_DIR = getenv("TEMP_DIR", "/root/_tmp")
+TEMP_DIR = getenv("TEMP_DIR", "/runpod-volume/_tmp")
 SLEEP_TIME = int(getenv("SLEEP_TIME", 0))
 DATASET_DIR = f"{TEMP_DIR}/dataset"
 TRAIN_DIR = f"{TEMP_DIR}/train"

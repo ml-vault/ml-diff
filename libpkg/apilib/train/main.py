@@ -31,7 +31,7 @@ class OutputConfig:
 
     @property
     def out_dir(self):
-        return f"/runpod-volume/{self.base_path}"
+        return f"{self.base_path}"
 
     def getArgs(self):
         dynamic = ""
