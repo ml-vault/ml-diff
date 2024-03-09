@@ -116,9 +116,10 @@ class TrainNetworkConfig(TrainConfig):
         self.continue_from = continue_from
     def getArgs(self) -> str:
         dynamic = ""
+        continue_from = ""
         if self.continue_from:
-            return f"--network_weights {self.continue_from} "
-        return f"--dataset_config {self.config_file_path} \
+            continue_from = f"--network_weights {self.continue_from}"
+        return f"{continue_from} --dataset_config {self.config_file_path} \
         --pretrained_model_name_or_path {self.pretrained_model_name_or_path} \
         --train_batch_size {self.train_batch_size} \
         --network_dim {self.network_dim} --network_alpha {self.network_alpha} \
