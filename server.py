@@ -1,10 +1,8 @@
 import json
 import os
-import shutil
-from apilib.train import train_xl_lora_from_datapack, train_xl_model
-from apilib.train.main import resolve_model_name
+from libpkg.apilib.train import train_xl_lora_from_datapack, train_xl_model
 import runpod
-from apilib.util.env import TEMP_DIR, DOWNLOAD_DIR, MODEL_DIR
+from libpkg.apilib.util.env import TEMP_DIR, DOWNLOAD_DIR, MODEL_DIR
 from mlvault.datapack import DataPack
 from mlvault.config import get_w_token
 from huggingface_hub import create_repo, upload_folder

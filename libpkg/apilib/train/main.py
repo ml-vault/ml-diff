@@ -31,7 +31,7 @@ class OutputConfig:
 
     @property
     def out_dir(self):
-        return f"{self.base_path}"
+        return f"/runpod-volume/{self.base_path}"
 
     def getArgs(self):
         dynamic = ""
@@ -202,7 +202,7 @@ def train_xl_lora_from_datapack(datapack: DataPack, job_input:dict):
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
-        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train_network.py {args}"
+        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train_network.py --resolution 1024 {args}"
         run_cli(cmd)
         return
     except:
@@ -235,7 +235,7 @@ def train_xl_model(datapack: DataPack, job_input:dict):
                                     prompt_path= f"{base_dir}/sample.txt"
                                     )
         args = gen_train_lora_args(output_config=output_config, train_config=train_config, sample_config=sample_config, optimizer_config=AdamW8bitConfig())
-        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train.py {args}"
+        cmd = f"accelerate launch --mixed_precision {train_config.mixed_precision} {sd_scripts_path}/sdxl_train.py --resolution 1024 {args} "
         run_cli(cmd)
     except:
         print("train failed!")
