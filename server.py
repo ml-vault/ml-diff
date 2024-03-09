@@ -20,6 +20,7 @@ class ValidateError(Exception):
     pass
 
 def handler(payload):
+    
     job_input = payload['input']
     try:
         print("started")
@@ -45,6 +46,10 @@ def handler(payload):
         repo_dir = job_input['output']['model_name']
         os.environ["WORKING_REPO"] = working_repo
         os.environ["REPO_DIR"] = repo_dir
+        print("uplaoder url", os.environ.get("UPLOADER_URL", ""))
+        print("working_repo",  os.environ.get("WORKING_REPO", ""))
+        print("repo_dir",  os.environ.get("REPO_DIR", ""))
+        print("write_token",  os.environ.get("W_TOKEN"))
         local_work_dir = os.path.join(TEMP_DIR, repo_dir)
         os.makedirs(local_work_dir, exist_ok=True)
         print("loading dynamic datapack")
