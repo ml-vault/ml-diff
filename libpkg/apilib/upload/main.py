@@ -57,4 +57,5 @@ def call_uploader(upload_dir:str):
     }
     
     print(f"will be called with these payload: {repr(payload)}")
-    requests.post(uploader_url, json=payload)
+    uploader_key = os.environ.get("UPLOADER_KEY", "")
+    requests.post(uploader_url, json=payload, headers={"Authorization": f"Bearer {uploader_key}"})
