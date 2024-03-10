@@ -1,3 +1,4 @@
+import requests
 from ..util import is_model
 from ..util.env import HF_USER, W_TOKEN, R_TOKEN
 from huggingface_hub import upload_file, create_repo, file_exists, repo_exists, upload_folder
@@ -39,3 +40,21 @@ def upload_all_files_to_hf(repo_id:str, local_dir:str):
     except:
         print("upload to hf failed!")
         raise
+
+def call_uploader(upload_dir:str):
+    print("calling uploader")
+    uploader_url = os.environ.get("UPLOADER_URL", "")
+    working_repo = os.environ.get("WORKING_REPO", "")
+    repo_dir = os.environ.get("REPO_DIR", "")
+    write_token = os.environ.get("W_TOKEN", "")
+    payload  = {
+        "input":{
+            "upload_dir": upload_dir,
+            "repo_id": working_repo,
+            "repo_path": repo_dir,
+            "write_token": write_token
+        }
+    }
+    
+    print(f"will be called with these payload: {repr(payload)}")
+    requests.post(uploader_url, json=payload)
