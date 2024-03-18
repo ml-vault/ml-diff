@@ -59,3 +59,9 @@ def call_uploader(upload_dir:str):
     print(f"will be called with these payload: {repr(payload)}")
     uploader_key = os.environ.get("UPLOADER_KEY", "")
     requests.post(uploader_url, json=payload, headers={"Authorization": f"Bearer {uploader_key}"})
+
+def upload_file_future(file_path:str, path_in_repo:str):
+    print("uploading file to hf with future")
+    working_repo = os.environ.get("WORKING_REPO", "")
+    write_token = os.environ.get("W_TOKEN", "")
+    upload_file(repo_id=working_repo, path_or_fileobj=file_path, path_in_repo=path_in_repo, token=write_token, run_as_future=True )
