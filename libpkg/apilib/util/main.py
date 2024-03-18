@@ -10,7 +10,7 @@ def run_cli(args:str):
     try:
         return subprocess.check_output(args, shell=True)
     except subprocess.CalledProcessError as e:
-        raise e.stderr
+        raise BaseException(repr(e)) from e.stderr
 
 def is_model(name:str)->bool:
     _, ext = os.path.splitext(name)
