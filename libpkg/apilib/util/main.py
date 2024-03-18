@@ -7,10 +7,7 @@ def run_cli(args:str):
     print(f"run cli: {args}")
     print(f"sleep {SLEEP_TIME} seconds")
     sleep(SLEEP_TIME)
-    try:
-        return subprocess.check_output(args, shell=True)
-    except subprocess.CalledProcessError as e:
-        raise BaseException(repr(e)) from e.stderr
+    return subprocess.check_output(args, shell=True)
 
 def is_model(name:str)->bool:
     _, ext = os.path.splitext(name)
