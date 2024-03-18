@@ -64,4 +64,4 @@ def upload_file_future(file_path:str, path_in_repo:str):
     print("uploading file to hf with future")
     working_repo = os.environ.get("WORKING_REPO", "")
     write_token = os.environ.get("W_TOKEN", "")
-    upload_file(repo_id=working_repo, path_or_fileobj=file_path, path_in_repo=path_in_repo, token=write_token, run_as_future=True )
+    upload_file(repo_id=working_repo, path_or_fileobj=file_path, path_in_repo=path_in_repo, token=write_token, run_as_future=True)
